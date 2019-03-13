@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 from math import log2
 
-addressSize = 4 #bytes
-blocks = 1
+addressSize = 64//8 #bytes
+blocks = 64//addressSize
 blockSize = blocks*addressSize
-ways = 1
+ways = 8
 setSize = 256
 cacheSize = blockSize * setSize * ways
 
@@ -24,13 +24,13 @@ print(len(trace))
 #trace = trace[:100]
 sets = [0]*len(trace)
 
-blockBits = int(log2(blocks))
-setBits = int(''.join(['1']*int(log2(setSize))),2) << int(log2(blocks))
+blockBits = int(''.join(['1']*int(log2(blockSize))),2)
+setBits = int(''.join(['1']*int(log2(setSize))),2) << int(log2(blockSize))
 print(format(blockBits, "b"),format(setBits, "b"))
 
 for t in range(len(trace)):
 	a = int(trace[t].split(' ')[1])
-	print('Address',format(a, "b"))
+	#print('Address',format(a, "b"))
 	b = a & blockBits
 	s = a & setBits
 	sets[t] = s
