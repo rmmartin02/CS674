@@ -190,6 +190,9 @@ if __name__ == "__main__":
         info[file]['miss'] = miss
         info[file]['setCache'] = setCache
         info[file]['wayCache'] = wayCache
+        info[file]['metaCache'] = metaCache
+        if cacheAlg == 'LFU' or cacheAlg == 'MFU' or cacheAlg == 'LRU2':
+            info[file]['metaCache2'] = metaCache2
 
     info['hitTotal'] = hitTotal
     info['missTotal'] = missTotal
