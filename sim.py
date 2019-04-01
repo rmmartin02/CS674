@@ -1,12 +1,9 @@
-import matplotlib.pyplot as plt
 from math import log2
-from pprint import pprint
 import random
 import sys
 import os
 import numpy as np
 import pickle
-import util
 
 #https://github.com/CMU-SAFARI/ramulator
 
