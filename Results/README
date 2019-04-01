@@ -1,0 +1,5 @@
+Results of experiments
+
+l1: 32KB    8 way
+l2: 256KB   8 way
+l3: 6144KB  12 way
