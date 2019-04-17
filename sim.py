@@ -1,3 +1,7 @@
+'''
+Cache simulator for only l1 cache
+'''
+
 from math import log2
 import random
 import sys
