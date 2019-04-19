@@ -10,17 +10,15 @@ import multiprocessing
 import numpy as np
 import pickle
 
-#https://github.com/CMU-SAFARI/ramulator
 
-#address size = 48 bits
-#cache block size = 64 bits
-#store address >> blockSize in cache
+# https://github.com/CMU-SAFARI/ramulator
+
+# address size = 48 bits
+# cache block size = 64 bits
+# store address >> blockSize in cache
 
 # loop to parallelize
 def calculateSet(cacheAlg, addressArray, i, return_dict):
-    for a in addressArray:
-        b = a[1]
-        tag = a[0]
     cache = np.zeros((ways, blockSize), dtype=int)
 
     if cacheAlg == 'LFU' or cacheAlg == 'MFU' or cacheAlg == 'LRU2':
@@ -31,25 +29,25 @@ def calculateSet(cacheAlg, addressArray, i, return_dict):
         metaCache = np.zeros(ways, dtype=int)
     wayCache = np.zeros(ways, dtype=int)
 
-    #print(cache, cache[0][0] == 0)
-    #print(setSize)
+    # print(cache, cache[0][0] == 0)
+    # print(setSize)
 
-    #print(len(trace))
+    # print(len(trace))
     # trace = trace[:100]
     sets = [0] * len(trace)
 
     blockMask = int(''.join(['1'] * blockBits), 2)
     setMask = int(''.join(['1'] * setBits), 2)
-    #print(format(blockMask, "b"), format(setMask, "b"))
+    # print(format(blockMask, "b"), format(setMask, "b"))
 
     hit = 0
     miss = 0
 
     for a in addressArray:
-        #if t % 1000 == 0:
+        # if t % 1000 == 0:
         #    print(t, len(trace), t / len(trace) * 100)
-        #print('Address',format(a, "b"))
-        b = a[1]
+        # print('Address',format(a, "b"))
+        # b = a[1]
         tag = a[0]
 
         found = False
@@ -152,7 +150,7 @@ if __name__ == "__main__":
     except:
         print('sim.py trace cacheAlg cacheSize(kB) #ofWays')
 
-    lamb = .5 # 0=>LFU 1=>LRU
+    lamb = .5  # 0=>LFU 1=>LRU
 
     blockSize = 64 // 8  # 64 bits, 8 bits per byte
 
@@ -180,7 +178,7 @@ if __name__ == "__main__":
         with open('./Traces/{}'.format(file)) as f:
             trace = f.readlines()
 
-        setList = [[]]*setSize
+        setDict = {}
 
         for t in range(len(trace)):
             if t % 1000 == 0:
@@ -190,16 +188,24 @@ if __name__ == "__main__":
             s = (a >> setBits) & setMask
             b = a & blockBits
             tag = (a >> setBits) >> blockBits
-            setList[s].append((tag, b))
+            if s in setDict:
+                setDict[s][0] += 1
+                setDict[s].append((b, tag))
+            else:
+                setDict[s] = [1, s, (b, tag)]
+
+    # sort so sets with most amount of accesses are done first and together
+    # lengths are first entry of set
 
     numThreads = 8
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
-    for i in range(len(setList)//numThreads):
+    for i in range(len(setList) // numThreads):
         jobs = []
         for j in range(numThreads):
-            print(i)
-            p = multiprocessing.Process(target=calculateSet, args=(cacheAlg, setList[i*numThreads+j], i*numThreads+j, return_dict))
+            print(i*numThreads + j)
+            p = multiprocessing.Process(target=calculateSet,
+                                        args=(cacheAlg, setList[i * numThreads + j], i * numThreads + j, return_dict))
             jobs.append(p)
             p.start()
 
