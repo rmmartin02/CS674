@@ -172,6 +172,11 @@ if __name__ == "__main__":
             if t % 1000 == 0:
                 print(t, len(trace), t / len(trace) * 100)
             address = int(trace[t].split(' ')[1])
+
+            print(address)
+            address = abs(hash(address)) % (setSize)
+            print(address)
+
             # print('Address',format(a, "b"))
             setNum = (address >> setBits) & setMask
             block = address & blockBits
