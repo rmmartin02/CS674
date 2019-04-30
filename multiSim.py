@@ -190,7 +190,7 @@ if __name__ == "__main__":
         #(setList[0][1][2:])
         #sys.exit()
 
-        numThreads = 8
+        numThreads = 1
         manager = multiprocessing.Manager()
         return_dict = manager.dict()
         for i in range(len(setList) // numThreads):
