@@ -36,26 +36,38 @@ if __name__ == "__main__":
 
     with open('./Traces/{}'.format(file1)) as f:
         trace1 = f.readlines()
-    trace1 = [int(a.split(' ')[-1].rstrip()) for a in trace1]
+    trace1 = [(int(a.split(' ')[0]), int(a.split(' ')[1])) for a in trace1]
 
     with open('./Traces/{}'.format(file2)) as f:
         trace2 = f.readlines()
-    trace2 = [int(a.split(' ')[-1].rstrip()) for a in trace2]
+    trace2 = [(int(a.split(' ')[0]), int(a.split(' ')[1])) for a in trace2]
 
-    if len(trace1)>len(trace2):
-        trace1 = trace1[:len(trace2)]
-    else:
-        trace2 = trace2[:len(trace1)]
-    print(len(trace1), len(trace2))
+    trace = [0] * (len(trace1)+len(trace2))
+    trace[0] = trace1[0][1]
+    trace[1] = trace2[0][1]
+    t1 = trace1[0][0]
+    t2 = trace2[0][0]
+    idx1 = 1
+    idx2 = 1
+    for i in range(2, len(trace)):
+        if i % 1000 == 0:
+            print(i, len(trace), i / len(trace) * 100)
+        if (t1 <= t2 and idx1 < len(trace1)) or idx2 >= len(trace2):
+            trace[i] = trace1[idx1][1]
+            t1 += trace1[idx1][0]
+            idx1 += 1
+        else:
+            trace[i] = trace2[idx2][1]
+            t2 += trace2[idx2][0]
+            idx2 += 1
 
-    trace = [0] * (len(trace1)*2)
-    for i in range(0, len(trace), 2):
-        trace[i] = trace1[i//2]
-        trace[i+1] = trace2[i//2]
-
+    hitList = [0]*(len(trace)//1000)
     for t in range(len(trace)):
         if t % 1000 == 0:
-            print(t, len(trace), t / len(trace) * 100)
+            idx = t//1000
+            if t!=0 and idx<len(hitList):
+                hitList[idx] = cache.hit/(cache.hit+cache.miss)
+                print(t, len(trace), t / len(trace) * 100)
         a = trace[t]
 
         found = cache.find(a)
@@ -65,13 +77,14 @@ if __name__ == "__main__":
     info = {}
     info['hits'] = cache.hit
     info['miss'] = cache.miss
+    info['hitList'] = hitList
     info['setCache'] = cache.setCache
     info['wayCache'] = cache.wayCache
     info['metaCache'] = cache.metaCache
     if cacheAlg == 'LFU' or cacheAlg == 'MFU' or cacheAlg == 'LRU2':
         info['metaCache2'] = cache.metaCache2
 
-    with open('./Results/{}_{}_{}_{}KB_{}way.pickle'.format(sys.argv[1],sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]), 'wb') as f:
+    with open('./Results/{}_{}_{}_{}KB_{}way.pickle'.format(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]), 'wb') as f:
         pickle.dump(info, f)
 
 
